@@ -131,7 +131,7 @@ def TryY(k):
             s = s + d[0][v]
             edges = edges + 1
 
-            if (k==N) :
+            if (k==K) :
                 TryX(Y[1], 1)
             else :
                 TryY(k+1)
