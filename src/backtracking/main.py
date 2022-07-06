@@ -5,7 +5,7 @@ import numpy as np
 
 
 #config
-input_path = "res/data.text"
+input_path = "../../res/data.text"
 MAX_NODE = 100 #max number of nodes in the graph include points 0
 MAX_CAR = 10
 MAX_P_CAR = 1 #max people a car can carry
@@ -39,8 +39,9 @@ Y_res = np.zeros(MAX_CAR, dtype='int') # Y[k] is the first node of car k in the 
 X_res = np.zeros(MAX_NODE, dtype='int') #X[v] is next node of v in the result graph
 
 edges = 0 # The algorithm will end if edges = 2*Sigma + K
-s = 0 #sum travel distance
+s = np.zeros(MAX_CAR, dtype='int') #sum travel distance of car k
 res = sys.maxsize
+
 
 def check_solution():
     global X, Y
@@ -69,12 +70,13 @@ def solution():
     #     path.append('0')
     #     print("Car" + str(i) + " : " + '-'.join(tuple(path)))
     if (check_solution()):
-        if s < res:
+        max_s = np.max(s[np.nonzero(s)])
+        if max_s < res:
             X_res = np.copy(X)
             Y_res = np.copy(Y)
             p_car_res = np.copy(p_car)
             q_car_res = np.copy(q_car)
-            res = s
+            res = max_s
 
 def checkX(u,v,k):
     if (visited[u] and u !=0): return False
@@ -99,7 +101,7 @@ def TryX(v,k):
             visited_k[k][u] = True
             p_car[k] = p_car[k] + p[u]
             q_car[k] = q_car[k] + q[u]
-            s = s + d[v][u]
+            s[k] = s[k] + d[v][u]
             edges = edges + 1
 
             if (u == 0):
@@ -112,7 +114,7 @@ def TryX(v,k):
                 TryX(u,k)
 
             edges = edges - 1
-            s = s - d[v][u]
+            s[k] = s[k] - d[v][u]
             q_car[k] = q_car[k] - q[u]
             p_car[k] = p_car[k] - p[u]
             visited_k[k][u] = False
@@ -128,7 +130,7 @@ def TryY(k):
             visited_k[k][v] = True
             p_car[k] = p_car[k] + p[v]
             q_car[k] = q_car[k] + q[v]
-            s = s + d[0][v]
+            s[k] = s[k] + d[0][v]
             edges = edges + 1
 
             if (k==K) :
@@ -137,7 +139,7 @@ def TryY(k):
                 TryY(k+1)
 
             edges = edges - 1
-            s = s- d[0][v]
+            s[k] = s[k]- d[0][v]
             q_car[k] = q_car[k] - q[v]
             p_car[k] = p_car[k] - p[v]
             visited_k[k][v] = False
@@ -194,6 +196,7 @@ def main():
             v = X_res[v]
         path.append('0')
         print("Car" + str(i) + " : " + '-'.join(tuple(path)))
+    print(f"Max distance: {res}" )
 
 if __name__ == "__main__":
     main()

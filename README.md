@@ -2,3 +2,8 @@
 
 
 The Share-a-Ride Problem - 
+
+
+# requirement
+pip install -r requirements.txt
+
