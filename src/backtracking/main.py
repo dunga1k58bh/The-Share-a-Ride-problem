@@ -186,7 +186,7 @@ def main():
     for i in range(0, 2*SIGMA+1):
         visited[i] = False
     TryY(1)
-    print("Min travel distance: " + str(res))
+    # print("Max travel distance: " + str(res))
     print("Path: ")
     for i in range(1, K+1):
         path = ['0']
