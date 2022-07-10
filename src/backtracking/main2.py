@@ -2,7 +2,6 @@ from ntpath import join
 from pickle import TRUE
 import sys
 import numpy as np
-import time
 
 
 #config
@@ -102,7 +101,8 @@ def TryX(v,k):
             visited_k[k][u] = True
             p_car[k] = p_car[k] + p[u]
             q_car[k] = q_car[k] + q[u]
-            s[k] = s[k] + d[v][u]
+            if (u!=0):
+                s[k] = s[k] + d[v][u]
             edges = edges + 1
 
             if (u == 0):
@@ -115,7 +115,8 @@ def TryX(v,k):
                 TryX(u,k)
 
             edges = edges - 1
-            s[k] = s[k] - d[v][u]
+            if (u!=0):
+                s[k] = s[k] - d[v][u]
             q_car[k] = q_car[k] - q[u]
             p_car[k] = p_car[k] - p[u]
             visited_k[k][u] = False
@@ -195,12 +196,8 @@ def main():
         while (v):
             path.append(str(v))
             v = X_res[v]
-        path.append('0')
         print("Car" + str(i) + " : " + '-'.join(tuple(path)))
     print(f"Max distance: {res}" )
 
 if __name__ == "__main__":
-    rt = time.time()
     main()
-    st = time.time()
-    print(f"Time running: {st - rt}")

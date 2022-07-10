@@ -12,10 +12,9 @@ def getInput(input_path):
         f.close()
     return tmp
 
-
 def main():
     # Input
-    tmp = getInput('./res/data.text')
+    tmp = getInput('../res/data.text')
     distanceMatrix = tmp[3:]
     passengerNumber = tmp[0][0]
     parcelNumber = tmp[0][1]
