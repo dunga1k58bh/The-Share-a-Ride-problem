@@ -6,7 +6,7 @@ import time
 
 
 #config
-input_path = "../../res/data.text"
+input_path = "../../res/testcase1/test1.txt"
 MAX_NODE = 100 #max number of nodes in the graph include points 0
 MAX_CAR = 10
 MAX_P_CAR = 1 #max people a car can carry
@@ -60,24 +60,26 @@ def solution():
     global res, s, num_results, X_res, Y_res, X, Y, q_car_res, p_car_res, q_car, p_car
     num_results = num_results + 1
 
-    # print("Travel distance (" + str(num_results) +") :" + str(s))
-    # print("Path: ")
-    # for i in range(1, K+1):
-    #     path = ['0']
-    #     v = Y[i]
-    #     while (v):
-    #         path.append(str(v))
-    #         v = X[v]
-    #     path.append('0')
-    #     print("Car" + str(i) + " : " + '-'.join(tuple(path)))
     if (check_solution()):
         max_s = np.max(s[np.nonzero(s)])
-        if max_s < res:
+        if max_s <= res:
             X_res = np.copy(X)
             Y_res = np.copy(Y)
             p_car_res = np.copy(p_car)
             q_car_res = np.copy(q_car)
             res = max_s
+            print("---------------------------")
+            print("Better solution")
+            print("Path: ")
+            for i in range(1, K+1):
+                path = ['0']
+                v = Y_res[i]
+                while (v):
+                    path.append(str(v))
+                    v = X_res[v]
+                path.append('0')
+                print("Car" + str(i) + " : " + '-'.join(tuple(path)))
+            print(f"Max distance: {res}" )
 
 def checkX(u,v,k):
     if (visited[u] and u !=0): return False
@@ -187,7 +189,8 @@ def main():
     for i in range(0, 2*SIGMA+1):
         visited[i] = False
     TryY(1)
-    # print("Max travel distance: " + str(res))
+    print("---------------------------")
+    print("Optimal Solution")
     print("Path: ")
     for i in range(1, K+1):
         path = ['0']

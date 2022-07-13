@@ -71,33 +71,32 @@ def solve(data):
             for j in range(2 * SIGMA + 1):
                 x[k,i,j] = solver.IntVar(0,1,f'x[{k},{i},{j}]')
             w[k,i] = solver.IntVar(max(0, data['q'][i]), min(data['Q'][k], data['Q'][k] + data['q'][i]), f'w[{k},{i}]')
-            r[k,i] = solver.IntVar(0,1, f'r[{k},{i}]')
+            r[k,i] = solver.IntVar(max(0, data['p'][i]), min(1           , 1            + data['p'][i]), f'r[{k},{i}]')
 
-            u[k,i] = solver.IntVar(1, 2*SIGMA, f'u[{k},{i}]')
+            u[k,i] = solver.IntVar(0, 2*SIGMA, f'u[{k},{i}]')
 
     target = solver.IntVar(0, solver.infinity(), 'target')
 
     ############################## CONSTRAINTS #######################################
 
     # Tong so canh cua do thi la 2M + 2N + K
-    # solver.Add(2 * SIGMA == sum(x[k,i,j] for k in range(1,data['K'] + 1) for i in range(2*SIGMA +1) for j in range(2*SIGMA +1)))
     cons1 = solver.Constraint(2* SIGMA + K, 2*SIGMA +K)
     for k in range(1, K+1):
         for i in range(2*SIGMA +1):
             for j in range(2*SIGMA +1):
                 cons1.SetCoefficient(x[k,i,j], 1)
 
-    #MLZ
-    for i in range(1, 2*SIGMA+1):
-        for j in range(1, 2*SIGMA+1):
-                if j != i:
-                    for k in range(1, K+1):
-                        solver.Add(u[k, i-1]-u[k, j-1]+ 2*SIGMA* x[k, i, j] <= 2*SIGMA-1)
-
+    #MTZ
+    for k in range(1, K+1):
+        for i in range(1, 2*SIGMA+1):
+            for j in range(0, 2*SIGMA+1):
+                    if j != i:
+                        solver.Add(u[k, j] - u[k, i] >= 1 - (2*SIGMA + 1)*(1 - x[k, i, j]))
+                        if j == i + SIGMA:
+                            solver.Add(u[k, j] >= u[k, i])
 
     # Moi xe deu xuat phat tu root va ket thuc tai root
     for k in range(1, K+1):
-    #     solver.Add(0 == sum(x[k,i,data['root']] for i in range(2*SIGMA + 1)))
         cons2 = solver.Constraint(1,1)
         cons3 = solver.Constraint(1,1)
         for i in range(1,2*SIGMA +1):
@@ -120,20 +119,20 @@ def solve(data):
         for i in range(2*SIGMA +1):
             solver.Add(sum(x[k,j,i] for j in range(2*SIGMA +1)) == sum (x[k,i,j] for j in range(2*SIGMA +1)))
 
-    # #Don tra 1 doi tuong phai cung tai 1 xe
+    # # #Don tra 1 doi tuong phai cung tai 1 xe
     for k in range(1, K +1):
         for j in range(1, SIGMA+1):
             solver.Add(sum(x[k, i, j] for i in range(2*SIGMA + 1))
                     == sum(x[k, i, j + SIGMA] for i in range(2*SIGMA +1)))
 
-    # # #Tong so nguoi tren xe tai 1 thoi diem
+    # #Tong so nguoi tren xe tai 1 thoi diem
     for k in range(1, K +1):
         solver.Add(r[k, 0] == 0)
-        for i in range(1, 2*SIGMA +1):
-            for j in range(1, 2*SIGMA +1):
-                solver.Add(r[k, j] >=  r[k, j] + p[j] - 1000000 * (1 - x[k, i, j]))
+        for i in range(2*SIGMA +1):
+            for j in range(2*SIGMA +1):
+                solver.Add(r[k, j] >= r[k, i] + p[j] - 1000000 * (1 - x[k, i, j]))
 
-    # # #Tong so hang tai mot thoi diem
+    # # # #Tong so hang tai mot thoi diem
     for k in range(1, K +1):
         solver.Add(w[k, 0] == 0)
         for i in range(2*SIGMA +1):
@@ -162,7 +161,13 @@ def solve(data):
         print(f'Minimal of Maximum distance travel of {K} car = {solver.Objective().Value()}')
         s=0
         for k in range(1, K+1):
+            count = 0
+            for i in range(2*SIGMA +1):
+                for j in range(2*SIGMA +1):
+                    if x[k, 0, i].solution_value() == 1:
+                        count+=1
             path = ['0']
+            current = 0
             for i in range(2*SIGMA +1):
                 if x[k, 0, i].solution_value() == 1:
                     current = i
@@ -177,8 +182,9 @@ def solve(data):
                         break;
             s= '-'.join(path)
             print(f'Xe {k}: {s}')
+        print(f'Tong so canh: {count}')
 
 def main():
-    data = create_data_model('../../res/data.text')
+    data = create_data_model('../../res/testcase1/test1.txt')
     solve(data)
 main()
