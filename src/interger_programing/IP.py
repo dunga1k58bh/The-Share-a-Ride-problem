@@ -2,6 +2,11 @@ import time
 import numpy as np
 from ortools.linear_solver import pywraplp
 
+
+def main():
+    data = create_data_model('../../res/data.text')
+    solve(data, 60*30)
+
 def create_data_model(path):
     #Store the data model of the problem
     data = {}
@@ -51,7 +56,7 @@ def create_data_model(path):
         data['SIGMA'] = SIGMA
     return data
 
-def solve(data):
+def solve(data, time_limit_in_seconds):
     solver = pywraplp.Solver.CreateSolver('SCIP')
 
     N = data['N']
@@ -148,7 +153,7 @@ def solve(data):
         solver.Add(object <= target)
 
     # Set time limit (mili second)
-    solver.set_time_limit(1000 * 60 * 30)
+    solver.set_time_limit(1000 * time_limit_in_seconds)
 
     solver.Minimize(target)
     rt = time.time()
@@ -160,11 +165,11 @@ def solve(data):
     if status == pywraplp.Solver.FEASIBLE or status == pywraplp.Solver.OPTIMAL :
         print(f'Minimal of Maximum distance travel of {K} car = {solver.Objective().Value()}')
         s=0
+        count = 0
         for k in range(1, K+1):
-            count = 0
             for i in range(2*SIGMA +1):
                 for j in range(2*SIGMA +1):
-                    if x[k, 0, i].solution_value() == 1:
+                    if x[k, i, j].solution_value() == 1:
                         count+=1
             path = ['0']
             current = 0
@@ -184,7 +189,4 @@ def solve(data):
             print(f'Xe {k}: {s}')
         print(f'Tong so canh: {count}')
 
-def main():
-    data = create_data_model('../../res/testcase1/test1.txt')
-    solve(data)
 main()

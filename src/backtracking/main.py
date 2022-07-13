@@ -6,7 +6,7 @@ import time
 
 
 #config
-input_path = "../../res/testcase1/test1.txt"
+input_path = "../../res/testcase2/test2.txt"
 MAX_NODE = 100 #max number of nodes in the graph include points 0
 MAX_CAR = 10
 MAX_P_CAR = 1 #max people a car can carry
