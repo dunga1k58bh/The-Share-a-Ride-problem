@@ -6,7 +6,7 @@ from ortools.linear_solver import pywraplp
 def main():
     data = create_data_model('../../res/testcase4/test1.txt')
     # Runtime limit is 30 minutes
-    solve(data, 30)
+    solve(data, 60*30)
 
 def create_data_model(path):
     #Store the data model of the problem
@@ -162,8 +162,8 @@ def solve(data, time_limit_in_seconds):
     st = time.time()
     print(f'Time running: {st - rt}')
 
-    ############################## PRINT SOLUTION #######################################
-    if status == pywraplp.Solver.FEASIBLE or status == pywraplp.Solver.OPTIMAL :
+    ############################# PRINT SOLUTION #######################################
+    if status == pywraplp.Solver.FEASIBLE or status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.INFEASIBLE:
         print(f'Minimal of Maximum distance travel of {K} car = {solver.Objective().Value()}')
         s=0
         count = 0

@@ -4,7 +4,7 @@ from ortools.sat.python import cp_model
 import math
 
 def main():
-    data = create_data_model('../../res/testcase4/test2.txt')
+    data = create_data_model('../../res/testcase4/test1.txt')
     solve(data)
 
 def create_data_model(path):
