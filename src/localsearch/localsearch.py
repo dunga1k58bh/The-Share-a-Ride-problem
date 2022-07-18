@@ -9,7 +9,7 @@ import time
 def create_data_model():
     """Get data from file"""
     tmp = []
-    with open("./res/data.text", "r") as f:
+    with open("../../res/testcase4/test1.txt", "r") as f:
         for i in f.readlines():
             i = i.replace("\n", "")
             i = i.rstrip(" ").split(" ")
@@ -149,7 +149,7 @@ def main():
         routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION)
     search_parameters.local_search_metaheuristic = (
         routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH)
-    search_parameters.time_limit.FromSeconds(1 ** 3)
+    search_parameters.time_limit.FromSeconds(60*30)
 
     # Solve the problem.
     solution = routing.SolveWithParameters(search_parameters)

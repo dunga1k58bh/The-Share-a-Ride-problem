@@ -4,8 +4,9 @@ from ortools.linear_solver import pywraplp
 
 
 def main():
-    data = create_data_model('../../res/data.text')
-    solve(data, 60*30)
+    data = create_data_model('../../res/testcase4/test1.txt')
+    # Runtime limit is 30 minutes
+    solve(data, 30)
 
 def create_data_model(path):
     #Store the data model of the problem

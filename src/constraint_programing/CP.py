@@ -4,7 +4,7 @@ from ortools.sat.python import cp_model
 import math
 
 def main():
-    data = create_data_model('../../res/testcase3/test1.txt')
+    data = create_data_model('../../res/testcase4/test2.txt')
     solve(data)
 
 def create_data_model(path):
@@ -149,17 +149,18 @@ def solve(data):
     model.Minimize(target)
     solver = cp_model.CpSolver()
     # print(solver.infinity())
-    # solver.parameters.max_time_in_seconds = 0.2
+    solver.parameters.max_time_in_seconds = 30 * 60
+    rt = time.time()
+    print('Solver begin: ')
     status = solver.Solve(model)
-
-    # Set time limit (mili second)
-    # solver.set_time_limit(1000 * 60 * 30)
-    # rt = time.time()
-    # st = time.time()
-    # print(f'Time running: {st - rt}')
+    print('Solver end: ')
+    st = time.time()
+    print(f'Time running: {st - rt}')
 
     ############################## PRINT SOLUTION #######################################
-    if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE :
+    if status == cp_model.MODEL_INVALID:
+        print("Invalid Model")
+    if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE or status == cp_model.INFEASIBLE:
         print(f'Minimal of Maximum distance travel of {K} car = {solver.Value(target)}')
         s=0
         count = 0
