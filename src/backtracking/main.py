@@ -6,7 +6,7 @@ import time
 
 
 #config
-input_path = "../../res/testcase2/test2.txt"
+input_path = "../../res/testcase2/test1.txt"
 MAX_NODE = 100 #max number of nodes in the graph include points 0
 MAX_CAR = 10
 MAX_P_CAR = 1 #max people a car can carry
@@ -68,18 +68,18 @@ def solution():
             p_car_res = np.copy(p_car)
             q_car_res = np.copy(q_car)
             res = max_s
-            print("---------------------------")
-            print("Better solution")
-            print("Path: ")
-            for i in range(1, K+1):
-                path = ['0']
-                v = Y_res[i]
-                while (v):
-                    path.append(str(v))
-                    v = X_res[v]
-                path.append('0')
-                print("Car" + str(i) + " : " + '-'.join(tuple(path)))
-            print(f"Max distance: {res}" )
+            # print("---------------------------")
+            # print("Better solution")
+            # print("Path: ")
+            # for i in range(1, K+1):
+            #     path = ['0']
+            #     v = Y_res[i]
+            #     while (v):
+            #         path.append(str(v))
+            #         v = X_res[v]
+            #     path.append('0')
+            #     print("Car" + str(i) + " : " + '-'.join(tuple(path)))
+            # print(f"Max distance: {res}" )
 
 def checkX(u,v,k):
     if (visited[u] and u !=0): return False
