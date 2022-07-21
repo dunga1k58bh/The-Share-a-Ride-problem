@@ -3,13 +3,11 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 import time
 
-"""Simple Pickup Delivery Problem (PDP)."""
 
-
-def create_data_model():
+def create_data_model(i):
     """Get data from file"""
     tmp = []
-    with open("../../res/testcase4/test1.txt", "r") as f:
+    with open(f"./res/testcase1/test{i}.txt", "r") as f:
         for i in f.readlines():
             i = i.replace("\n", "")
             i = i.rstrip(" ").split(" ")
@@ -17,31 +15,36 @@ def create_data_model():
     f.close()
 
     distanceMatrix = tmp[3:]
-    hanhkhach = tmp[0][0]
-    goihang = tmp[0][1]
+    passengerNumber = tmp[0][0]
+    parcelNumber = tmp[0][1]
     vehicleNumber = tmp[0][2]
-    khoiLuongGoiHang = tmp[1]
-    khoiLuongToiDaMoiXe = tmp[2]
+    parcelWeight = tmp[1]
+    maxWeightVehicle = tmp[2]
     """Stores the data for the problem."""
     data = {}
     data['distance_matrix'] = distanceMatrix
+    # pickup at i and delivery at i + N + M
     data['pickups_deliveries'] = [
-        [i, i+hanhkhach+goihang] for i in range(1, hanhkhach+goihang+1)
+        [i, i+passengerNumber+parcelNumber] for i in range(1, passengerNumber+parcelNumber+1)
     ]
-    data['demands'] = [0 for i in range(hanhkhach+1)] + khoiLuongGoiHang + [
-        0 for i in range(hanhkhach)] + list(map(lambda x: -x, khoiLuongGoiHang))
-    data['passengers'] = [0] + [1 for i in range(hanhkhach)] + [0 for i in range(
-        goihang)] + [-1 for i in range(hanhkhach)] + [0 for i in range(goihang)]
-    data['vehicle_capacities'] = khoiLuongToiDaMoiXe
+    # pickup and delivery parcel
+    data['demands'] = [0 for i in range(passengerNumber+1)] + parcelWeight + [
+        0 for i in range(passengerNumber)] + list(map(lambda x: -x, parcelWeight))
+    # pickup and delivery passengers
+    data['passengers'] = [0] + [1 for i in range(passengerNumber)] + [0 for i in range(
+        parcelNumber)] + [-1 for i in range(passengerNumber)] + [0 for i in range(parcelNumber)]
+
+    data['vehicle_capacities'] = maxWeightVehicle
     data['passenger_capacities'] = [1 for i in range(vehicleNumber)]
     data['num_vehicles'] = vehicleNumber
+    # 0 -> ... -> 0
     data['depot'] = 0
     return data
 
 
-def print_solution(data, manager, routing, solution):
+def print_solution(data, manager, routing, solution, i):
     """Prints solution on console."""
-    print(f'Objective: {solution.ObjectiveValue()}')
+    print(f'Test: {i}')
     output_distance = 0
 
     for vehicle_id in range(data['num_vehicles']):
@@ -54,7 +57,6 @@ def print_solution(data, manager, routing, solution):
             node_index = manager.IndexToNode(index)
             route_load += data['passengers'][node_index]
             pack_load += data['demands'][node_index]
-            # plan_output += ' {0} Load({1} and {2}) -> '.format(node_index, route_load, pack_load)
             plan_output += ' {0} -> '.format(node_index)
             previous_index = index
             index = solution.Value(routing.NextVar(index))
@@ -67,10 +69,10 @@ def print_solution(data, manager, routing, solution):
     print('Maximum of all routes: {}'.format(output_distance))
 
 
-def main():
+def main(i):
     """Entry point of the program."""
     # Instantiate the data problem.
-    data = create_data_model()
+    data = create_data_model(i)
 
     # Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(
@@ -147,20 +149,30 @@ def main():
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
         routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION)
+    # search_parameters.local_search_metaheuristic = (
+    #     routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH)
+    # search_parameters.local_search_metaheuristic = (
+    #     routing_enums_pb2.LocalSearchMetaheuristic.SIMULATED_ANNEALING)
+    # search_parameters.local_search_metaheuristic = (
+    #     routing_enums_pb2.LocalSearchMetaheuristic.GREEDY_DESCENT)
     search_parameters.local_search_metaheuristic = (
-        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH)
-    search_parameters.time_limit.FromSeconds(60*30)
+        routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH)
+    search_parameters.time_limit.FromSeconds(600)
 
     # Solve the problem.
+    
+    rt = time.time()
     solution = routing.SolveWithParameters(search_parameters)
+    st = time.time()
 
     # Print solution on console.
     if solution:
-        print_solution(data, manager, routing, solution)
+        print_solution(data, manager, routing, solution, i)
+        print(f"Time running: {st - rt}")
+    else:
+        print("NOOOOO")
 
 
 if __name__ == "__main__":
-    rt = time.time()
-    main()
-    st = time.time()
-    print(f"Time running: {st - rt}")
+    for i in range(1, 2):
+        main(i)
