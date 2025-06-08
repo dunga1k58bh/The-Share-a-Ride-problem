@@ -4,12 +4,10 @@
 The code to solve the share a ride problem
 
 
-# requirement
+# Requirement
 pip install -r requirements.txt
 
 # Run
 
-```
-  
-```
+Please see the script in the src folder
 
